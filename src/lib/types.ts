@@ -5,8 +5,8 @@ export type ExtraAttack = {
 
 export type Monster = {
   number: number;
-  name: string;
   alive: boolean;
+  name?: string;
   ac?: number;
   hp?: number;
   target?: string;
@@ -18,7 +18,11 @@ export type Monster = {
   info?: string;
 };
 
-export type Combat = {
-  round: number;
+export type Round = {
+  roundNumber: number;
   monsters: Monster[];
+};
+export type Combat = {
+  currentRoundNumber: number;
+  roundsData: Round[];
 };
