@@ -2,6 +2,9 @@
   --text-color: rgba(255, 255, 255, 0.87);
   --background-color: hsl(249, 18%, 14%);
   --button-bg: hsl(257, 48%, 12%);
+  --button-bg-hover: hsl(257, 60%, 36%);
+  --button-bg-highlighted: hsl(148, 100%, 15%);
+  --button-bg-highlighted-hover: hsl(148, 94%, 26%);
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -17,27 +20,41 @@ body {
   min-height: 100vh;
 }
 
-button {
+button,
+.btn {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid hsl(237, 34%, 47%);
   padding: 0.5em 1em;
   font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
   background-color: var(--button-bg);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.125s, background-color 0.125s;
 }
-button:hover {
+button:hover,
+.btn:hover {
   border-color: hsl(237, 100%, 70%);
+  background-color: var(--button-bg-hover);
 }
 button:focus,
-button:focus-visible {
+button:focus-visible,
+.btn:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+  background-color: var(--button-bg-hover);
 }
 
 select {
   color: inherit;
+}
+
+.highlighted {
+  background-color: var(--button-bg-highlighted);
+}
+
+.highlighted:hover,
+.highlighted:focus-visible {
+  background-color: var(--button-bg-highlighted-hover);
 }
 
 @media (prefers-color-scheme: light) {
@@ -45,5 +62,8 @@ select {
     --text-color: hsl(234, 37%, 20%);
     --background-color: hsl(234, 83%, 98%);
     --button-bg: hsl(214, 94%, 87%);
+    --button-bg-hover: hsl(214, 93%, 68%);
+    --button-bg-highlighted: hsl(131, 96%, 80%);
+    --button-bg-highlighted-hover: hsl(131, 72%, 61%);
   }
 }
