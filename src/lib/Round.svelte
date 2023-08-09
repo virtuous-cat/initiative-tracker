@@ -302,16 +302,23 @@
     border-spacing: 0px;
     margin-block: 1rem;
     border: 1px solid var(--text-color);
+    border-top-color: var(--button-border-hover);
   }
   thead {
     position: sticky;
-    top: 90px;
+    top: 0px;
     background-color: var(--background-color);
   }
   td,
   th {
     border: 1px solid var(--text-color);
     padding: 0.5rem 1rem;
+  }
+  thead th {
+    border: 2px solid var(--button-border-hover);
+  }
+  tbody :first-child td {
+    border-top-color: var(--button-border-hover);
   }
   .btn-td > :not(:last-child) {
     margin-inline-end: 0.75rem;
@@ -327,12 +334,13 @@
   }
   .info div {
     flex-grow: 1;
+    min-height: 24.4px;
   }
   .btn {
     border-radius: 6px;
     padding: 0 0.25rem;
+    line-height: 1.2;
     margin-inline-start: 14px;
-    /* color: var(--text-color); */
   }
   .buttons {
     display: flex;

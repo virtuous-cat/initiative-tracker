@@ -27,6 +27,7 @@
   let savedCombats: SavedCombat[] = [];
   let selectedCombat: SavedCombat;
   let combatTitle: string;
+  let lastSavedRound: number;
 
   function getSavedCombats() {
     const combats: SavedCombat[] = [];
@@ -61,6 +62,7 @@
       }
       localStorage.setItem(title, JSON.stringify(combat));
       combatTitle = title;
+      lastSavedRound = combat.currentRoundNumber;
       getSavedCombats();
       selectedCombat = savedCombats.find((saved) => saved.title === title);
     }}>Save Combat</button
@@ -81,6 +83,8 @@
         class="delete"
         on:click={() => {
           localStorage.removeItem(selectedCombat.title);
+          combatTitle = undefined;
+          lastSavedRound = undefined;
           getSavedCombats();
         }}>Delete</button
       >
@@ -89,6 +93,7 @@
         on:click={() => {
           combat = selectedCombat.combat;
           combatTitle = selectedCombat.title;
+          lastSavedRound = selectedCombat.combat.currentRoundNumber;
         }}>Load Saved Combat</button
       >
     </div>
@@ -104,19 +109,40 @@
     />
   {/each}
 </main>
+<footer>
+  <p>
+    <strong>Last saved as:</strong>
+    {combatTitle ?? "Not saved"} - Round: {lastSavedRound ?? "N/A"}
+  </p>
+  <button
+    class="save highlighted"
+    on:click={() => {
+      const title = window.prompt("Save As:", combatTitle);
+      if (!title || !title.length) {
+        return;
+      }
+      localStorage.setItem(title, JSON.stringify(combat));
+      combatTitle = title;
+      lastSavedRound = combat.currentRoundNumber;
+      getSavedCombats();
+      selectedCombat = savedCombats.find((saved) => saved.title === title);
+    }}>Save Combat</button
+  >
+</footer>
 
 <style>
-  header {
-    position: sticky;
-    top: 0;
+  h1 {
+    margin-block-end: 0;
+  }
+  header,
+  footer {
     display: flex;
-    background-color: var(--background-color);
-    height: 90px;
-    overflow: hidden;
-    z-index: 1;
   }
   .save {
     margin-inline-start: auto;
+    align-self: flex-end;
+  }
+  footer .save {
     align-self: center;
   }
   select {
@@ -124,8 +150,16 @@
     margin-block: 0.5rem 1rem;
     min-width: 10em;
   }
+  label {
+    margin-block-start: 1.5rem;
+    display: block;
+  }
   .saved-buttons {
     display: flex;
     gap: 0.75rem;
+  }
+  footer p {
+    font-size: 1.25rem;
+    line-height: 1;
   }
 </style>

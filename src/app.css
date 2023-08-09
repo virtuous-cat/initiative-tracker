@@ -5,6 +5,8 @@
   --button-bg-hover: hsl(257, 60%, 36%);
   --button-bg-highlighted: hsl(148, 100%, 15%);
   --button-bg-highlighted-hover: hsl(148, 94%, 26%);
+  --button-border: hsl(237, 34%, 47%);
+  --button-border-hover: hsl(237, 100%, 70%);
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -23,7 +25,7 @@ body {
 button,
 .btn {
   border-radius: 8px;
-  border: 1px solid hsl(237, 34%, 47%);
+  border: 1px solid var(--button-border);
   padding: 0.5em 1em;
   font-size: 1rem;
   font-weight: 500;
@@ -34,7 +36,7 @@ button,
 }
 button:hover,
 .btn:hover {
-  border-color: hsl(237, 100%, 70%);
+  border-color: var(--button-border-hover);
   background-color: var(--button-bg-hover);
 }
 
