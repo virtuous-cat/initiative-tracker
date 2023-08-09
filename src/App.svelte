@@ -15,6 +15,7 @@
             name: "",
             target: "",
             initiativeDie: INITIATIVE_DIE.NONE,
+            dexBonus: 0,
             extraAttacks: [],
             status: "",
             info: "",
@@ -67,25 +68,30 @@
 </header>
 <main>
   {#if savedCombats.length}
-    <select bind:value={selectedCombat}>
-      {#each savedCombats as savedCombat (savedCombat.title)}
-        <option value={savedCombat}>{savedCombat.title}</option>
-      {/each}
-    </select>
-    <button
-      class="delete"
-      on:click={() => {
-        localStorage.removeItem(selectedCombat.title);
-        getSavedCombats();
-      }}>Delete</button
-    >
-    <button
-      class="load"
-      on:click={() => {
-        combat = selectedCombat.combat;
-        combatTitle = selectedCombat.title;
-      }}>Load Saved Combat</button
-    >
+    <label>
+      Saved Combats:
+      <select bind:value={selectedCombat}>
+        {#each savedCombats as savedCombat (savedCombat.title)}
+          <option value={savedCombat}>{savedCombat.title}</option>
+        {/each}
+      </select>
+    </label>
+    <div class="saved-buttons">
+      <button
+        class="delete"
+        on:click={() => {
+          localStorage.removeItem(selectedCombat.title);
+          getSavedCombats();
+        }}>Delete</button
+      >
+      <button
+        class="load"
+        on:click={() => {
+          combat = selectedCombat.combat;
+          combatTitle = selectedCombat.title;
+        }}>Load Saved Combat</button
+      >
+    </div>
   {/if}
   {#each combat.roundsData as round}
     <Round
@@ -112,5 +118,14 @@
   .save {
     margin-inline-start: auto;
     align-self: center;
+  }
+  select {
+    display: block;
+    margin-block: 0.5rem 1rem;
+    min-width: 10em;
+  }
+  .saved-buttons {
+    display: flex;
+    gap: 0.75rem;
   }
 </style>

@@ -1,8 +1,3 @@
-export type ExtraAttack = {
-  initiativeDie?: "d4" | "d6" | "d8" | "d10" | "d12";
-  initiativeSeg?: number;
-};
-
 export const INITIATIVE_DIE = {
   NONE: "--",
   D4: "d4",
@@ -12,9 +7,13 @@ export const INITIATIVE_DIE = {
   D12: "d12",
 } as const;
 
-type ObjectValues<T> = T[keyof T];
+export type InitiativeDie =
+  (typeof INITIATIVE_DIE)[keyof typeof INITIATIVE_DIE];
 
-export type InitiativeDie = ObjectValues<typeof INITIATIVE_DIE>;
+export type ExtraAttack = {
+  initiativeDie?: InitiativeDie;
+  initiativeSeg?: number;
+};
 
 export type Monster = {
   number: number;
