@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import Round from "./lib/Round.svelte";
   import { INITIATIVE_DIE, type Combat, type SavedCombat } from "./lib/types";
+  import { fade, slide } from "svelte/transition";
 
   let combat: Combat = {
     currentRoundNumber: 1,
@@ -28,12 +29,16 @@
   let selectedCombat: SavedCombat;
   let combatTitle: string;
   let lastSavedRound: number;
+  let autoSort = false;
 
   function getSavedCombats() {
     const combats: SavedCombat[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       console.log(localStorage.key(i));
-      if (localStorage.key(i) === "admin") {
+      if (
+        localStorage.key(i) === "admin" ||
+        localStorage.key(i) === "autoSort"
+      ) {
         continue;
       }
       const combat = JSON.parse(
@@ -46,6 +51,9 @@
 
   onMount(() => {
     getSavedCombats();
+    if (localStorage.getItem("autoSort")) {
+      autoSort = true;
+    }
   });
 </script>
 
@@ -70,37 +78,57 @@
 </header>
 <main>
   {#if savedCombats.length}
-    <label>
-      Saved Combats:
-      <select bind:value={selectedCombat}>
-        {#each savedCombats as savedCombat (savedCombat.title)}
-          <option value={savedCombat}>{savedCombat.title}</option>
-        {/each}
-      </select>
-    </label>
-    <div class="saved-buttons">
-      <button
-        class="delete"
-        on:click={() => {
-          localStorage.removeItem(selectedCombat.title);
-          combatTitle = undefined;
-          lastSavedRound = undefined;
-          getSavedCombats();
-        }}>Delete</button
-      >
-      <button
-        class="load"
-        on:click={() => {
-          combat = selectedCombat.combat;
-          combatTitle = selectedCombat.title;
-          lastSavedRound = selectedCombat.combat.currentRoundNumber;
-        }}>Load Saved Combat</button
-      >
+    <div in:fade out:slide>
+      <label class="saved">
+        Saved Combats:
+        <select bind:value={selectedCombat}>
+          {#each savedCombats as savedCombat (savedCombat.title)}
+            <option value={savedCombat}>{savedCombat.title}</option>
+          {/each}
+        </select>
+      </label>
+      <div class="saved-buttons">
+        <button
+          class="delete"
+          on:click={() => {
+            localStorage.removeItem(selectedCombat.title);
+            combatTitle = undefined;
+            lastSavedRound = undefined;
+            getSavedCombats();
+          }}>Delete</button
+        >
+        <button
+          class="load"
+          on:click={() => {
+            combat = selectedCombat.combat;
+            combatTitle = selectedCombat.title;
+            lastSavedRound = selectedCombat.combat.currentRoundNumber;
+          }}>Load Saved Combat</button
+        >
+      </div>
     </div>
   {/if}
+  <div class="auto-sort">
+    <input
+      type="checkbox"
+      id="auto-sort"
+      bind:checked={autoSort}
+      on:change={() => {
+        if (autoSort) {
+          localStorage.setItem("autoSort", "true");
+        } else {
+          localStorage.removeItem("autoSort");
+        }
+      }}
+    />
+    <label for="auto-sort"
+      >Automatically sort by segment when rolling all initiatives</label
+    >
+  </div>
   {#each combat.roundsData as round}
     <Round
       bind:round
+      {autoSort}
       current={round.roundNumber === combat.currentRoundNumber}
       on:next={(event) => {
         combat.roundsData = [...combat.roundsData, event.detail];
@@ -150,7 +178,7 @@
     margin-block: 0.5rem 1rem;
     min-width: 10em;
   }
-  label {
+  .saved {
     margin-block-start: 1.5rem;
     display: block;
   }
@@ -161,5 +189,10 @@
   footer p {
     font-size: 1.25rem;
     line-height: 1;
+  }
+  .auto-sort {
+    display: flex;
+    gap: 0.25rem;
+    margin-block-start: 1.5rem;
   }
 </style>

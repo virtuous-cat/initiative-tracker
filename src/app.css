@@ -20,6 +20,7 @@ body {
   margin: 0;
   padding-inline: 20px;
   min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 button,

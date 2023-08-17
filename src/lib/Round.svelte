@@ -1,17 +1,26 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import type { InitiativeDie, Round } from "./types";
   import { INITIATIVE_DIE } from "./types";
   import { Random } from "random-js";
+  import { fade, slide } from "svelte/transition";
 
   export let round: Round;
   export let current: boolean;
+  export let autoSort = false;
 
   let sortBy: string;
+  let roundHeading;
 
   const dispatch = createEventDispatcher<{ next: Round }>();
 
   const random = new Random();
+
+  onMount(() => {
+    if (roundHeading) {
+      roundHeading.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  });
 
   function rollInitiative({
     initiativeDie,
@@ -27,68 +36,94 @@
     const rawSeg = roll - dexBonus;
     return rawSeg < 0 ? 0 : rawSeg > 10 ? 10 : rawSeg;
   }
+
+  function sortBySeg() {
+    round.monsters = round.monsters.sort((monsterA, monsterB) => {
+      if (monsterA.extraAttacks?.length || monsterB.extraAttacks?.length) {
+        const attacksA = [
+          monsterA.initiativeSeg,
+          ...monsterA.extraAttacks.map((attack) => attack.initiativeSeg),
+        ];
+        const earliestA = attacksA.sort((a, b) => a - b)[0];
+        const attacksB = [
+          monsterB.initiativeSeg,
+          ...monsterB.extraAttacks.map((attack) => attack.initiativeSeg),
+        ];
+        const earliestB = attacksB.sort((a, b) => a - b)[0];
+        return earliestA - earliestB;
+      }
+      return monsterA.initiativeSeg - monsterB.initiativeSeg;
+    });
+  }
 </script>
 
-<section class="round">
-  <h2>Round {round.roundNumber}</h2>
-  <label>
-    Sort by: <select
-      bind:value={sortBy}
-      on:change={() => {
-        switch (sortBy) {
-          case "number":
-            round.monsters = round.monsters.sort(
-              (monsterA, monsterB) => monsterA.number - monsterB.number
-            );
-            break;
-          case "name":
-            round.monsters = round.monsters.sort((monsterA, monsterB) => {
-              const nameA = monsterA.name.toUpperCase();
-              const nameB = monsterB.name.toUpperCase();
-              if (nameA < nameB) {
-                return -1;
-              }
-              if (nameA > nameB) {
-                return 1;
-              }
-              return 0;
-            });
-            break;
-          case "seg":
-            round.monsters = round.monsters.sort((monsterA, monsterB) => {
-              if (
-                monsterA.extraAttacks?.length ||
-                monsterB.extraAttacks?.length
-              ) {
-                const attacksA = [
-                  monsterA.initiativeSeg,
-                  ...monsterA.extraAttacks.map(
-                    (attack) => attack.initiativeSeg
-                  ),
-                ];
-                const earliestA = attacksA.sort((a, b) => a - b)[0];
-                const attacksB = [
-                  monsterB.initiativeSeg,
-                  ...monsterB.extraAttacks.map(
-                    (attack) => attack.initiativeSeg
-                  ),
-                ];
-                const earliestB = attacksB.sort((a, b) => a - b)[0];
-                return earliestA - earliestB;
-              }
-              return monsterA.initiativeSeg - monsterB.initiativeSeg;
-            });
-            break;
-          default:
-            break;
+<section class="round" transition:fade={{ duration: 500 }}>
+  <h2 bind:this={roundHeading}>Round {round.roundNumber}</h2>
+  <div class="buttons">
+    <label class="sort">
+      Sort by: <select
+        bind:value={sortBy}
+        on:change={() => {
+          switch (sortBy) {
+            case "number":
+              round.monsters = round.monsters.sort(
+                (monsterA, monsterB) => monsterA.number - monsterB.number
+              );
+              break;
+            case "name":
+              round.monsters = round.monsters.sort((monsterA, monsterB) => {
+                const nameA = monsterA.name.toUpperCase();
+                const nameB = monsterB.name.toUpperCase();
+                if (nameA < nameB) {
+                  return -1;
+                }
+                if (nameA > nameB) {
+                  return 1;
+                }
+                return 0;
+              });
+              break;
+            case "seg":
+              sortBySeg();
+              break;
+            default:
+              break;
+          }
+        }}
+      >
+        <option value="number">Monster #</option>
+        <option value="name">Name</option>
+        <option value="seg">Earliest Initiative Segment</option>
+      </select>
+    </label>
+    <button
+      class="highlighted"
+      on:click={() => {
+        round.monsters = round.monsters.map((monster) => {
+          return {
+            ...monster,
+            initiativeSeg: rollInitiative({
+              initiativeDie: monster.initiativeDie,
+              dexBonus: monster.dexBonus,
+            }),
+            extraAttacks: monster.extraAttacks?.map((attack) => {
+              return {
+                ...attack,
+                initiativeSeg: rollInitiative({
+                  initiativeDie: attack.initiativeDie,
+                  dexBonus: monster.dexBonus,
+                }),
+              };
+            }),
+          };
+        });
+        if (autoSort) {
+          sortBySeg();
+          sortBy = "seg";
         }
-      }}
+      }}>Roll All Initiatives</button
     >
-      <option value="number">Monster #</option>
-      <option value="name">Name</option>
-      <option value="seg">Earliest Initiative Segment</option>
-    </select>
-  </label>
+  </div>
   <table>
     <thead>
       <tr>
@@ -158,8 +193,8 @@
                 round.monsters = [...round.monsters, newMonster];
               }}>Copy Monster</button
             >
-          </td></tr
-        >
+          </td>
+        </tr>
         <tr class="base-attacks" class:dead={!monster.alive}>
           <td class="empty" />
           <td
@@ -185,6 +220,9 @@
                   initiativeDie: monster.initiativeDie,
                   dexBonus: monster.dexBonus,
                 });
+                if (autoSort) {
+                  sortBySeg();
+                }
               }}>Roll Initiative</button
             >
           </td>
@@ -263,13 +301,16 @@
             }),
           };
         });
+        if (autoSort) {
+          sortBySeg();
+          sortBy = "seg";
+        }
       }}>Roll All Initiatives</button
     >
     {#if current}
       <button
         class="next highlighted"
         on:click={() => {
-          // TODO: maybe handle if sorted by seg
           const nextRound = {
             roundNumber: round.roundNumber + 1,
             monsters: round.monsters
@@ -290,7 +331,7 @@
     {/if}
   </div>
 </section>
-<hr />
+<hr transition:fade={{ duration: 500 }} />
 
 <style>
   .dead * {
@@ -308,6 +349,7 @@
     position: sticky;
     top: 0px;
     background-color: var(--background-color);
+    z-index: 1;
   }
   td,
   th {
