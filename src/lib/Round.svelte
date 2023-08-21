@@ -144,8 +144,14 @@
           <td contenteditable bind:textContent={monster.name} />
           <td class="info">
             <div contenteditable bind:textContent={monster.info} />
-            {#if monster.info?.startsWith("http")}
-              <a href={monster.info} target="_blank" class="btn">Go</a>
+            {#if monster.info?.includes("http")}
+              <a
+                href={monster.info
+                  .split(" ")
+                  .find((word) => word.startsWith("http"))}
+                target="_blank"
+                class="info-btn">Go</a
+              >
             {/if}
           </td>
           <td contenteditable bind:textContent={monster.target} />
@@ -378,7 +384,7 @@
     flex-grow: 1;
     min-height: 24.4px;
   }
-  .btn {
+  .info-btn {
     border-radius: 6px;
     padding: 0 0.25rem;
     line-height: 1.2;
