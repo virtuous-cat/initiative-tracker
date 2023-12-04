@@ -31,6 +31,32 @@
   let lastSavedRound: number;
   let autoSort = false;
 
+  function clearCombat() {
+    combat = {
+      currentRoundNumber: 1,
+      roundsData: [
+        {
+          roundNumber: 1,
+          monsters: [
+            {
+              number: 1,
+              alive: true,
+              name: "",
+              target: "",
+              initiativeDie: INITIATIVE_DIE.NONE,
+              dexBonus: 0,
+              extraAttacks: [],
+              status: "",
+              info: "",
+            },
+          ],
+        },
+      ],
+    };
+    combatTitle = undefined;
+    lastSavedRound = undefined;
+  }
+
   function getSavedCombats() {
     const combats: SavedCombat[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -61,20 +87,57 @@
   <h1>
     Initiative Tracker{combatTitle ? ` - ${combatTitle}` : ``} - Round: {combat.currentRoundNumber}
   </h1>
-  <button
-    class="save highlighted"
-    on:click={() => {
-      const title = window.prompt("Save As:", combatTitle);
-      if (!title || !title.length) {
-        return;
-      }
-      localStorage.setItem(title, JSON.stringify(combat));
-      combatTitle = title;
-      lastSavedRound = combat.currentRoundNumber;
-      getSavedCombats();
-      selectedCombat = savedCombats.find((saved) => saved.title === title);
-    }}>Save Combat</button
-  >
+  <div class="buttons">
+    <button
+      class="clear"
+      on:click={() => {
+        const lastSavedCombatState = combatTitle
+          ? JSON.parse(localStorage.getItem(combatTitle))
+          : null;
+        const lastString = lastSavedCombatState
+          ? JSON.stringify(
+              lastSavedCombatState.roundsData[
+                lastSavedCombatState.currentRoundNumber - 1
+              ].monsters
+            )
+          : null;
+        const currentString = JSON.stringify(
+          combat.roundsData[combat.currentRoundNumber - 1].monsters
+        );
+        const dirty =
+          (lastSavedRound && lastSavedRound !== combat.currentRoundNumber) ||
+          (lastSavedRound &&
+            lastSavedCombatState &&
+            lastString !== currentString) ||
+          (!lastSavedRound && combat.roundsData.length > 1) ||
+          (!lastSavedRound && combat.roundsData[0].monsters.length > 1) ||
+          (!lastSavedRound && combat.roundsData[0].monsters[0].name);
+        if (dirty) {
+          const discard = window.confirm(
+            "You have unsaved changes to the current combat. Discard changes?"
+          );
+          if (!discard) {
+            return;
+          }
+        }
+        clearCombat();
+      }}>Clear</button
+    >
+    <button
+      class="save highlighted"
+      on:click={() => {
+        const title = window.prompt("Save As:", combatTitle);
+        if (!title || !title.length) {
+          return;
+        }
+        localStorage.setItem(title, JSON.stringify(combat));
+        combatTitle = title;
+        lastSavedRound = combat.currentRoundNumber;
+        getSavedCombats();
+        selectedCombat = savedCombats.find((saved) => saved.title === title);
+      }}>Save Combat</button
+    >
+  </div>
 </header>
 {#if window?.location.hostname !== "localhost" && window?.location.hostname !== "127.0.0.1"}
   <aside>
@@ -264,9 +327,13 @@
   footer {
     display: flex;
   }
+  header .buttons,
   .save {
     margin-inline-start: auto;
     align-self: flex-end;
+  }
+  .clear {
+    margin-inline-end: 8px;
   }
   footer .save {
     align-self: center;
