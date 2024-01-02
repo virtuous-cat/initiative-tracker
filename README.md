@@ -1,1 +1,1 @@
-Basic D&D initiative tracker for our homebrew initiative system
+A Dungeons & Dragons initiative tracker for our homebrew initiative system. This initiative system was created by my DM's DM in the 1980's for 1st edition AD&D. I have adapted it for 5E using the house rules described on the site.
