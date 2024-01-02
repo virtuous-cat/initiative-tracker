@@ -326,11 +326,16 @@
   header,
   footer {
     display: flex;
+    flex-wrap: wrap;
+    column-gap: 12px;
   }
   header .buttons,
   .save {
     margin-inline-start: auto;
     align-self: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
   .clear {
     margin-inline-end: 8px;
@@ -340,39 +345,38 @@
   }
   select {
     display: block;
-    margin-block: 0.5rem 1rem;
+    margin-block: 8px 16px;
     min-width: 10em;
   }
   .saved {
-    margin-block-start: 1.5rem;
+    margin-block-start: 24px;
     display: block;
   }
   .saved-buttons {
     display: flex;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    gap: 12px;
   }
   footer p {
     font-size: 1.25rem;
     line-height: 1;
   }
   .auto-sort {
-    display: flex;
-    gap: 0.25rem;
-    margin-block-start: 1.5rem;
+    margin-block-start: 24px;
   }
   details {
-    margin-block-start: 0.5rem;
+    margin-block-start: 8px;
     max-width: 900px;
   }
   details > :not(summary) {
-    margin-inline-start: 3rem;
+    margin-inline-start: 48px;
     line-height: 1.7;
   }
   details > p:first-of-type {
-    margin-block: 1rem;
+    margin-block: 16px;
   }
   .details-heading {
     display: block;
-    margin-block-start: 1.5rem;
+    margin-block-start: 24px;
   }
 </style>

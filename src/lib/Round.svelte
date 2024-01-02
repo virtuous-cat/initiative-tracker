@@ -347,7 +347,7 @@
   table {
     border-collapse: separate;
     border-spacing: 0px;
-    margin-block: 1rem;
+    margin-block: 16px;
     border: 1px solid var(--text-color);
     border-top-color: var(--button-border-hover);
   }
@@ -360,7 +360,7 @@
   td,
   th {
     border: 1px solid var(--text-color);
-    padding: 0.5rem 1rem;
+    padding: 8px 16px;
   }
   thead th {
     border: 2px solid var(--button-border-hover);
@@ -369,7 +369,13 @@
     border-top-color: var(--button-border-hover);
   }
   .btn-td > :not(:last-child) {
-    margin-inline-end: 0.75rem;
+    margin-inline-end: 12px;
+  }
+  .btn-td > button {
+    margin-block-end: 4px;
+  }
+  .btn-td {
+    padding-block-end: 4px;
   }
   .empty {
     border-block: none;
@@ -386,20 +392,21 @@
   }
   .info-btn {
     border-radius: 6px;
-    padding: 0 0.25rem;
+    padding: 0 4px;
     line-height: 1.2;
     margin-inline-start: 14px;
   }
   .buttons {
     display: flex;
-    gap: 0.75em;
+    flex-wrap: wrap;
+    gap: 12px;
   }
   .next {
     margin-inline-start: auto;
   }
   hr {
     color: var(--text-color);
-    margin-block-start: 1.25em;
-    margin-block-end: 1.5em;
+    margin-block-start: 20px;
+    margin-block-end: 24px;
   }
 </style>
